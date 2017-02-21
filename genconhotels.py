@@ -1,5 +1,7 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
+import re
+from decimal import Decimal
 
 url = "https://aws.passkey.com/reg/32X3LVML-G0EF/"
 
@@ -52,38 +54,22 @@ if "Please select one" in html:
     for tag1 in hclass:
         htag = tag1.find_all("p", {"class": "name"})
         atag = tag1.find_all("p", {"class": "address"})
-        # ptag = tag1.find_all("div", {"class": "price"})
+        ptag = tag1.find_all("div", {"class": "price"})
         # dtag = tag1.find_all("", {"class": "mi"})
-        for hotel, addy in zip(htag, atag):
+        for hotel, addy, price, in zip(htag, atag, ptag):
             print(hotel.contents[0])
             print(addy.get_text().strip())
+            # print(price.get_text().strip())
+            x = re.findall('[0-9]{1,10}', price.get_text())
+            print(int(x[0]))
+
+            # re.findall('£{1}[,0-9]{1,10}','The little £250,000 brown fox jumped over the lazy dog')
+
             # print(address.contents[0])
             # print(price)
         # print(atag)
         # print(ptag)
         # print(dtag)
-
-    # hotels = soup.find_all("p", class_="name")
-    # for tag in hotels:
-    #     print(tag)
-
-# soup = BeautifulSoup(html)
-# divTag = soup.find_all("div", {"class": "tablebox"}):
-
-# for tag in divTag:
-#     tdTags = tag.find_all("td", {"class": "align-right"})
-#     for tag in tdTags:
-#         print tag.text
-
-
-    # for x in soup.find_all("p", class_="name"):
-    #     # print(x)
-    #     print(x.contents[0])
-
-
-        # for y in soup.find_all("div", class_="price"):
-        #     print(y)
-
 
     with open("results.html", "w") as temp:
         temp.write(soup.prettify())
