@@ -51,11 +51,12 @@ if "Please select one" in html:
 
     for tag1 in hclass:
         htag = tag1.find_all("p", {"class": "name"})
-        # atag = tag1.find_all("p", {"class": "address"})
+        atag = tag1.find_all("p", {"class": "address"})
         # ptag = tag1.find_all("div", {"class": "price"})
         # dtag = tag1.find_all("", {"class": "mi"})
-        for hotel in htag:
+        for hotel, addy in zip(htag, atag):
             print(hotel.contents[0])
+            print(addy.get_text().strip())
             # print(address.contents[0])
             # print(price)
         # print(atag)
