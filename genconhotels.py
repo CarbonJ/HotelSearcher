@@ -55,21 +55,16 @@ if "Please select one" in html:
         htag = tag1.find_all("p", {"class": "name"})
         atag = tag1.find_all("p", {"class": "address"})
         ptag = tag1.find_all("div", {"class": "price"})
-        # dtag = tag1.find_all("", {"class": "mi"})
-        for hotel, addy, price, in zip(htag, atag, ptag):
+        dtag = tag1.find_all("", {"class": "mi"})
+        for hotel, addy, price, mi in zip(htag, atag, ptag, dtag):
             print(hotel.contents[0])
             print(addy.get_text().strip())
             # print(price.get_text().strip())
-            x = re.findall('[0-9]{1,10}', price.get_text())
-            print(int(x[0]))
+            temp_price = re.findall('[0-9]{1,10}', price.get_text())
+            print(int(temp_price[0]))
 
-            # re.findall('£{1}[,0-9]{1,10}','The little £250,000 brown fox jumped over the lazy dog')
-
-            # print(address.contents[0])
-            # print(price)
-        # print(atag)
-        # print(ptag)
-        # print(dtag)
+            temp_mi = re.findall('[0-9]{1,10}', mi.get_text())
+            print(int(temp_mi[0]))
 
     with open("results.html", "w") as temp:
         temp.write(soup.prettify())
