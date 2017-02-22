@@ -91,9 +91,10 @@ class Scraper(object):
                                                 price.get_text())
                         temp_mi = re.findall('[0-9]{1,10}', mi.get_text())
                         templist.append(hotel.contents[0])
-                        templist.append(addy.get_text().strip())
-                        templist.append(temp_price)
-                        templist.append(temp_mi)
+                        templist.append(
+                            addy.get_text().strip().replace(u'\xa0', u' '))
+                        templist.append('.'.join(temp_price))
+                        templist.append('.'.join(temp_mi))
                         #logger.info(templist)
                         self.listings.append(templist)
 
