@@ -29,6 +29,7 @@ class Scraper(object):
 
     def __init__(self, url):
         self.url = url
+        self.listings = []
 
     def scrap(self, rooms, guests):
         logger.info("Starting URL: {}".format(self.url))
@@ -80,18 +81,21 @@ class Scraper(object):
                 hclass = soup.find_all("div", {"class": "h-content"})
 
                 for tag1 in hclass:
+                    templist = []
                     htag = tag1.find_all("p", {"class": "name"})
                     atag = tag1.find_all("p", {"class": "address"})
                     ptag = tag1.find_all("div", {"class": "price"})
                     dtag = tag1.find_all("", {"class": "mi"})
                     for hotel, addy, price, mi in zip(htag, atag, ptag, dtag):
-                        # print(hotel.contents[0])
-                        # print(addy.get_text().strip())
                         temp_price = re.findall('[0-9]{1,10}',
                                                 price.get_text())
-                        # print(int(temp_price[0]))
                         temp_mi = re.findall('[0-9]{1,10}', mi.get_text())
-                        # print(int(temp_mi[0]))
+                        templist.append(hotel.contents[0])
+                        templist.append(addy.get_text().strip())
+                        templist.append(temp_price)
+                        templist.append(temp_mi)
+                        #logger.info(templist)
+                        self.listings.append(templist)
 
                 with open("results.html", "w") as temp:
                     temp.write(soup.prettify())
@@ -119,6 +123,7 @@ if __name__ == "__main__":
     logger.info("Start of scraper.")
     scraper = Scraper(url)
     scraper.scrap(1, 3)
+    logger.info(scraper.listings)
     logger.info("End of scraper.")
 
 # # Needed variables
