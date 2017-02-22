@@ -1,15 +1,33 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import re
-from decimal import Decimal
+import logging
 
+# Logging configuration
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# Create a file handler
+handler = logging.FileHandler('scraper.log')
+handler.setLevel(logging.INFO)
+
+# Create a logging format
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# Add the handlers to the logger
+logger.addHandler(handler)
+
+
+# Needed variables
 url = "https://aws.passkey.com/reg/32X3LVML-G0EF/"
 
+# Selenium getting page
 driver = webdriver.PhantomJS()
 driver.set_window_size(1120, 550)
+
 driver.get(url)
 
-# First, navigate date range
 
 try:
     driver.find_element_by_css_selector("h5.accordion").click()
@@ -33,14 +51,11 @@ except Exception as e:
 
 try:
     driver.find_element_by_link_text("FIND").click()
-    #driver.find_element_by_css_selector("label.event-tooltip-filename.devtools-monospace").click()
     delay = 5  # seconds
 except driver.NoSuchElementException as e:
     driver.save_screenshot('screenshot.png')
     raise e
     print(e)
-
-# print(driver.current_url)
 
 html = driver.page_source
 
@@ -70,7 +85,6 @@ if "Please select one" in html:
         temp.write(soup.prettify())
         driver.save_screenshot('screenshot.png')
 
-
 elif "TERMS OF SERVICE" in html:
     print('On main page')
 elif "Sorry..." in html:
@@ -82,3 +96,5 @@ else:
 
 driver.quit()
 
+if __name__ == "__main__":
+    logger.info("Start of scraper.")
