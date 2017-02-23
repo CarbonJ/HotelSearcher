@@ -30,12 +30,17 @@ logger.addHandler(handler)
 class Scraper(object):
     """docstring for scraper"""
 
-    def __init__(self, url, slacktoken):
+    def __init__(self, url, slacktoken, env):
         self.url = url
         self.listings = []
         self.token = slacktoken
         self.slack_client = SlackClient(self.token)
-        self.channel = 'conventions'
+        if env == 'Live':
+            self.channel = 'conventions'
+            logger.info("Results to be sent to 'conventions'. ")
+        else:
+            self.channel = 'justinbot'
+            logger.info("Results to be sent to 'justinbot'. ")
 
     def send_message(self, channel_id, message):
         self.slack_client.api_call(
@@ -43,12 +48,12 @@ class Scraper(object):
             channel=channel_id,
             text=message,
             username='Gencon Hotels',
-            icon_emoji=':hotel:'
-        )
+            icon_emoji=':hotel:')
 
     def scrap(self, rooms, guests):
         logger.info("Starting URL: {}".format(self.url))
-        logger.info("Searching for - Rooms: {}, Guests: {}".format(rooms, guests))
+        logger.info(
+            "Searching for - Rooms: {}, Guests: {}".format(rooms, guests))
 
         # Selenium getting page
         driver = webdriver.PhantomJS()
@@ -124,9 +129,8 @@ class Scraper(object):
             elif "Sorry..." in self.page:
                 logger.info("Website or navigation failed.")
             else:
-                logger.info(
-                    "Unknown website information. Getting temp.html and screenshot"
-                )
+                logger.info("Unknown website information. Getting "
+                            "temp.html and screenshot")
                 driver.save_screenshot('unknown_screenshot.png')
                 with open("temp.html", "w") as temp:
                     temp.write(driver.page_source)
@@ -136,8 +140,10 @@ class Scraper(object):
             if self.listings:
                 logger.info("Found {} listings.".format(len(self.listings)))
                 logger.info(self.listings)
-                message = "\nSearch Parameters: Rooms - {}, Guests - {} _(Currently wrong, is 1 & 1)_\n".format(
-                    rooms, guests)
+                message = "\nSearch Parameters: " \
+                          "Rooms - {}, Guests - {} "\
+                          "_(Currently wrong, is 1 & 1)_ " \
+                          "\n".format(rooms, guests)
                 for entry in self.listings:
                     logger.info(entry)
                     message += '*{}*\n'.format(entry[0])
@@ -150,6 +156,6 @@ class Scraper(object):
 
 if __name__ == "__main__":
     logger.info("Start of scraper.")
-    scraper = Scraper(url, slacktoken)
+    scraper = Scraper(url, slacktoken, 'Test')  # Live or anything else
     scraper.scrap(1, 3)  # # of rooms, # of guests
     logger.info("End of scraper.")
