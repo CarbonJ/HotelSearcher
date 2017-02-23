@@ -6,7 +6,7 @@ import time
 from slackclient import SlackClient
 import config
 
-# Basic variables
+# Basic variables out of config.py
 url = config.url
 slacktoken = config.slacktoken
 
@@ -28,18 +28,17 @@ logger.addHandler(handler)
 
 
 class Scraper(object):
-    """docstring for scraper"""
-
+    """Performs scraping and Slack notifications"""
     def __init__(self, url, slacktoken, env):
         self.url = url
         self.listings = []
         self.token = slacktoken
         self.slack_client = SlackClient(self.token)
         if env == 'Live':
-            self.channel = 'conventions'
+            self.channel = config.livechannel
             logger.info("Results to be sent to 'conventions'. ")
         else:
-            self.channel = 'justinbot'
+            self.channel = config.testchannel
             logger.info("Results to be sent to 'justinbot'. ")
 
     def send_message(self, channel_id, message):
@@ -62,7 +61,6 @@ class Scraper(object):
 
         # Input calendar parameters
         try:
-            # DEFECT: Not getting proper values submitted via selenium
             driver.find_element_by_css_selector("h5.accordion").click()
             driver.find_element_by_link_text("16").click()
             driver.find_element_by_css_selector(
@@ -74,6 +72,7 @@ class Scraper(object):
             logger.info(e)
 
         # Input room parameters
+        # DEFECT: Not getting proper values submitted via selenium
         try:
             driver.find_element_by_id("spinner-room").click()
             driver.find_element_by_id("spinner-room").clear()
@@ -139,7 +138,6 @@ class Scraper(object):
 
             if self.listings:
                 logger.info("Found {} listings.".format(len(self.listings)))
-                logger.info(self.listings)
                 message = "\nSearch Parameters: " \
                           "Rooms - {}, Guests - {} "\
                           "_(Currently wrong, is 1 & 1)_ " \
