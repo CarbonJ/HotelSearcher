@@ -4,12 +4,11 @@ import re
 import logging
 import time
 from slackclient import SlackClient
+import config
 
 # Basic variables
-url = "https://aws.passkey.com/reg/32X3LVML-G0EF/"
-slacktoken = "xoxp-30257646832-31007291333-122570921494-3aa5f801f77c64a770c30848f3a853ed"
-# IF = "xoxp-30257646832-31007291333-122570921494-3aa5f801f77c64a770c30848f3a853ed"
-# PLAYGROUND = "xoxp-68577966134-68595498578-71928386018-507d7acc20"
+url = config.url
+slacktoken = config.slacktoken
 
 # Logging configuration
 logger = logging.getLogger(__name__)
