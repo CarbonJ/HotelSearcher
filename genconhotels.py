@@ -3,9 +3,11 @@ from bs4 import BeautifulSoup
 import re
 import logging
 import time
+from slackclient import SlackClient
 
 # Basic variables
 url = "https://aws.passkey.com/reg/32X3LVML-G0EF/"
+slacktoken = "xoxp-68577966134-68595498578-71928386018-507d7acc20"
 
 # Logging configuration
 logger = logging.getLogger(__name__)
@@ -27,9 +29,20 @@ logger.addHandler(handler)
 class Scraper(object):
     """docstring for scraper"""
 
-    def __init__(self, url):
+    def __init__(self, url, slacktoken):
         self.url = url
         self.listings = []
+        self.token = slacktoken
+        self.slack_client = SlackClient(self.token)
+
+    def send_message(channel_id, message):
+        self.slack_client.api_call(
+            "chat.postMessage",
+            channel=channel_id,
+            text=message,
+            username='pythonbot',
+            icon_emoji=':ninja:'
+        )
 
     def scrap(self, rooms, guests):
         logger.info("Starting URL: {}".format(self.url))
@@ -122,7 +135,7 @@ class Scraper(object):
 
 if __name__ == "__main__":
     logger.info("Start of scraper.")
-    scraper = Scraper(url)
-    scraper.scrap(1, 3)  # # of rooms, # of guests
+    scraper = Scraper(url, slacktoken)
+    # scraper.scrap(1, 3)  # # of rooms, # of guests
     logger.info(scraper.listings)
     logger.info("End of scraper.")
