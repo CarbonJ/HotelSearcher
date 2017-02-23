@@ -7,7 +7,9 @@ from slackclient import SlackClient
 
 # Basic variables
 url = "https://aws.passkey.com/reg/32X3LVML-G0EF/"
-slacktoken = "xoxp-68577966134-68595498578-71928386018-507d7acc20"
+slacktoken = "xoxp-30257646832-31007291333-122570921494-3aa5f801f77c64a770c30848f3a853ed"
+# IF = "xoxp-30257646832-31007291333-122570921494-3aa5f801f77c64a770c30848f3a853ed"
+# PLAYGROUND = "xoxp-68577966134-68595498578-71928386018-507d7acc20"
 
 # Logging configuration
 logger = logging.getLogger(__name__)
@@ -34,19 +36,20 @@ class Scraper(object):
         self.listings = []
         self.token = slacktoken
         self.slack_client = SlackClient(self.token)
+        self.channel = 'conventions'
 
-    def send_message(channel_id, message):
+    def send_message(self, channel_id, message):
         self.slack_client.api_call(
             "chat.postMessage",
             channel=channel_id,
             text=message,
-            username='pythonbot',
-            icon_emoji=':ninja:'
+            username='Gencon Hotels',
+            icon_emoji=':hotel:'
         )
 
     def scrap(self, rooms, guests):
         logger.info("Starting URL: {}".format(self.url))
-        logger.info("Rooms: {}, Guests: {}".format(rooms, guests))
+        logger.info("Searching for - Rooms: {}, Guests: {}".format(rooms, guests))
 
         # Selenium getting page
         driver = webdriver.PhantomJS()
@@ -90,10 +93,9 @@ class Scraper(object):
             self.page = driver.page_source
 
             if "Please select one" in self.page:
-                logger.info("Found hotels in search")
+                logger.info("Search complete.")
                 soup = BeautifulSoup(self.page, "lxml")
                 hclass = soup.find_all("div", {"class": "h-content"})
-
                 for tag1 in hclass:
                     templist = []
                     htag = tag1.find_all("p", {"class": "name"})
@@ -132,10 +134,23 @@ class Scraper(object):
 
             driver.quit()
 
+            if self.listings:
+                logger.info("Found {} listings.".format(len(self.listings)))
+                logger.info(self.listings)
+                message = "\nSearch Parameters: Rooms - {}, Guests - {} _(Currently wrong, is 1 & 1)_\n".format(
+                    rooms, guests)
+                for entry in self.listings:
+                    logger.info(entry)
+                    message += '*{}*\n'.format(entry[0])
+                    message += '_{}_\n'.format(entry[1])
+                    message += 'Price: {}\n'.format(entry[2])
+                    message += 'Miles: {}\n'.format(entry[3])
+                    self.send_message(self.channel, message)
+                    message = ""
+
 
 if __name__ == "__main__":
     logger.info("Start of scraper.")
     scraper = Scraper(url, slacktoken)
-    # scraper.scrap(1, 3)  # # of rooms, # of guests
-    logger.info(scraper.listings)
+    scraper.scrap(1, 3)  # # of rooms, # of guests
     logger.info("End of scraper.")
