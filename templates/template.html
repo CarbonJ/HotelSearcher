@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Gecon Hotels</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            div#main {
+                max-width: 500px;
+                padding: 20px;
+            }
+
+            nav .title {
+                font-weight: bold;
+            }
+
+            a.active {
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main">
+            <p>Number of Listings: {{listing_count}}</p>
+            <p>Listings:</p>
+            <ul>
+                {% for n in my_list %}
+                <li>{{n}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </body>
+</html>

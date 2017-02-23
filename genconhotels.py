@@ -157,7 +157,6 @@ class Scraper(object):
                         message += 'Price: {}\n'.format(entry[2])
                         message += 'Miles: {}\n'.format(entry[3])
                         self.send_message(self.channel, message)
-                        print(self.channel)
                         message = ""
                 logger.info("Slack message sent to {}".format(self.channel))
             else:
