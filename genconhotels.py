@@ -34,12 +34,18 @@ class Scraper(object):
         self.listings = []
         self.token = slacktoken
         self.slack_client = SlackClient(self.token)
+        self.slack_send = True
+        self.channel = ''
+
         if env == 'Live':
             self.channel = config.livechannel
-            logger.info("Results to be sent to 'conventions'. ")
-        else:
+            logger.info("Results to be sent to '{}'.".format(self.channel))
+        elif env == 'Test':
             self.channel = config.testchannel
-            logger.info("Results to be sent to 'justinbot'. ")
+            logger.info("Results to be sent to '{}'.".format(self.channel))
+        else:
+            self.slack_send = False
+            logger.info("Results not sent to Slack ")
 
     def send_message(self, channel_id, message):
         self.slack_client.api_call(
@@ -136,24 +142,32 @@ class Scraper(object):
 
             driver.quit()
 
-            if self.listings:
-                logger.info("Found {} listings.".format(len(self.listings)))
-                message = "\nSearch Parameters: " \
-                          "Rooms - {}, Guests - {} "\
-                          "_(Currently wrong, is 1 & 1)_ " \
-                          "\n".format(rooms, guests)
-                for entry in self.listings:
-                    logger.info(entry)
-                    message += '*{}*\n'.format(entry[0])
-                    message += '_{}_\n'.format(entry[1])
-                    message += 'Price: {}\n'.format(entry[2])
-                    message += 'Miles: {}\n'.format(entry[3])
-                    self.send_message(self.channel, message)
-                    message = ""
+            if self.slack_send:
+                if self.listings:
+                    logger.info(
+                        "Found {} listings.".format(len(self.listings)))
+                    message = "\nSearch Parameters: " \
+                              "Rooms - {}, Guests - {} "\
+                              "_(Currently wrong, is 1 & 1)_ " \
+                              "\n".format(rooms, guests)
+                    for entry in self.listings:
+                        logger.info(entry)
+                        message += '*{}*\n'.format(entry[0])
+                        message += '_{}_\n'.format(entry[1])
+                        message += 'Price: {}\n'.format(entry[2])
+                        message += 'Miles: {}\n'.format(entry[3])
+                        self.send_message(self.channel, message)
+                        message = ""
+                logger.info("Slack message sent to {}".format(self.channel))
+            else:
+                logger.info("SOMETHING HERE")
+                if self.listings:
+                    logger.info(
+                        "Found {} listings.".format(len(self.listings)))
 
 
 if __name__ == "__main__":
     logger.info("Start of scraper.")
-    scraper = Scraper(url, slacktoken, 'Test')  # Live or anything else
+    scraper = Scraper(url, slacktoken, 'Test')  # 'Live', 'Test', 'Other'
     scraper.scrap(1, 3)  # # of rooms, # of guests
     logger.info("End of scraper.")
