@@ -17,6 +17,16 @@ def template_test():
 
     for base in scraper.listings:
         listfix.append(base)
+        listing = ''
+        for entry in base:
+            genconhotels.logger.info(entry)
+            listing += '<b>{}</b></br>'.format(entry)
+        #     listing += '<i>{}</i>/br>'.format(entry)
+        #     listing += 'Price: {}</br>'.format(entry)
+        #     listing += 'Miles: {}</br>'.format(entry)
+        # listfix.append(listing)
+        # genconhotels.logger.info(listing)
+
         # for subitem in base:
         #     for hotel in subitem:
         #         templist.append(subitem)
@@ -30,8 +40,7 @@ def template_test():
     return render_template(
         'template.html',
         listing_count=len(scraper.listings),
-        full_list=scraper.listings,
-        my_list=scraper.listings,)
+        my_list=listfix)
 
 
 if __name__ == '__main__':
