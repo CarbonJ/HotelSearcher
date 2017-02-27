@@ -62,6 +62,7 @@ class Scraper(object):
 
         # Selenium getting page
         driver = webdriver.PhantomJS()
+        # driver = webdriver.Chrome('/Users/justin/Documents/Projects/GenconHotel/chromedriver')
         driver.set_window_size(1120, 550)
         driver.get(self.url)
 
@@ -80,13 +81,47 @@ class Scraper(object):
         # Input room parameters
         # DEFECT: Not getting proper values submitted via selenium
         try:
-            driver.find_element_by_id("spinner-room").click()
-            driver.find_element_by_id("spinner-room").clear()
-            driver.find_element_by_id("spinner-room").send_keys(rooms)
+            logger.info("SELENIUM WORK START")
+            select = driver.find_element_by_id("spinner-guest")
+
+            if select:
+                logger.info("Found 'spinner-guest")
+                logger.info(select)
+                logger.info('Current Value: {}'.format(select.get_attribute('aria-valuenow')))
+                logger.info(select)
+
+            time.sleep(2)
+            driver.execute_script("arguments[0].setAttribute('aria-valuenow','6')", select)
+            time.sleep(2)
+            finder = driver.find_element_by_id("spinner-guest")
+            if finder:
+                logger.info('New Value: {}'.format(finder.get_attribute('aria-valuenow')))
+                logger.info(finder)
+            time.sleep(2)
             driver.find_element_by_id("spinner-guest").click()
             driver.find_element_by_id("spinner-guest").clear()
+            driver.find_element_by_id("spinner-guest").send_keys('\b')
             driver.find_element_by_id("spinner-guest").send_keys(guests)
-        except Exception as e:
+            #river.find_element_by_id("spinner-guest").submit()
+            logger.info('Post Click Value: {}'.format(select.get_attribute('aria-valuenow')))
+
+            again = driver.find_element_by_id("spinner-guest")
+            logger.info(again.get_attribute('aria-valuenow'))
+            logger.info(again)
+            time.sleep(2)
+            driver.execute_script("arguments[0].setAttribute('aria-valuenow','6')", select)
+            logger.info('Set Again Value: {}'.format(select.get_attribute('aria-valuenow')))
+
+
+            # driver.find_element_by_id("spinner-room").click()
+            # driver.find_element_by_id("spinner-room").clear()
+            # driver.find_element_by_id("spinner-room").send_keys(rooms)
+            # driver.find_element_by_id("spinner-guest").click()
+            # driver.find_element_by_id("spinner-guest").clear()
+            # driver.find_element_by_id("spinner-guest").send_keys(guests)
+            time.sleep(5)
+            logger.info("SELENIUM WORK END")
+        except (Exception) as e:
             raise e
             logger.info(e)
 
@@ -133,6 +168,9 @@ class Scraper(object):
                     temp.write(driver.page_source)
             elif "Sorry..." in self.page:
                 logger.info("Website or navigation failed.")
+            elif "No hotel matched your search criteria" in self.page:
+                logger.info("No matches found")
+                # DEFECT NEEDS OUTPUT
             else:
                 logger.info("Unknown website information. Getting "
                             "temp.html and screenshot")
@@ -169,5 +207,5 @@ class Scraper(object):
 if __name__ == "__main__":
     logger.info("Start of scraper.")
     scraper = Scraper(url, slacktoken, 'Test')  # 'Live', 'Test', 'Other'
-    scraper.scrap(1, 3)  # # of rooms, # of guests
+    scraper.scrap(1, 6)  # # of rooms, # of guests
     logger.info("End of scraper.")
