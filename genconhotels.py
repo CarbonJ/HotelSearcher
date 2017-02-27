@@ -56,9 +56,9 @@ class Scraper(object):
             icon_emoji=':hotel:')
 
     def scrap(self, rooms, guests):
-        logger.info("Starting URL: {}".format(self.url))
+        logger.info("Parameters: starting URL: {}".format(self.url))
         logger.info(
-            "Searching for - Rooms: {}, Guests: {}".format(rooms, guests))
+            "Parameters:  Room# {}, Guest# {}".format(rooms, guests))
 
         # Selenium getting page
         driver = webdriver.PhantomJS()
@@ -102,7 +102,7 @@ class Scraper(object):
                 driver.find_element_by_id("spinner-guest").send_keys('\b')
                 logger.info("Searching: sending guest value {}".format(guests))
                 driver.find_element_by_id("spinner-guest").send_keys(guests)
-                logger.info('Form Guest Value: {}'.format(gselect.get_attribute('aria-valuenow')))
+                #logger.info('Search: guest value on form: {}'.format(gselect.get_attribute('aria-valuenow')))
 
             time.sleep(1)
         except (Exception) as e:
@@ -119,11 +119,11 @@ class Scraper(object):
             logger.info(e)
 
         if driver.page_source:
-            logger.info("Scrap - 'a' web page found and now being scraped.")
+            logger.info("Scrape: web page found and now being scraped.")
             self.page = driver.page_source
 
             if "Please select one" in self.page:
-                logger.info("Scrap - hotels found.")
+                logger.info("Scrape: hotels found.")
                 soup = BeautifulSoup(self.page, "lxml")
                 hclass = soup.find_all("div", {"class": "h-content"})
                 for tag1 in hclass:
@@ -143,22 +143,22 @@ class Scraper(object):
                         templist.append('.'.join(temp_mi))
                         self.listings.append(templist)
 
-                with open("Scrap.html", "w") as temp:
+                with open("Scrape.html", "w") as temp:
                     temp.write(soup.prettify())
                     driver.save_screenshot('screenshot.png')
 
             elif "TERMS OF SERVICE" in self.page:
-                logger.info("Scrap - main page detected, something failed.")
+                logger.info("Scrape: main page detected, something failed.")
                 driver.save_screenshot('unknown_screenshot.png')
                 with open("temp.html", "w") as temp:
                     temp.write(driver.page_source)
             elif "Sorry..." in self.page:
-                logger.info("Scrap - error page detected, something failed")
+                logger.info("Scrape: error page detected, something failed")
             elif "No hotel matched your search criteria" in self.page:
-                logger.info("Scrap - 0 hotels found with that criteria.")
+                logger.info("Scrape: 0 hotels found with that criteria.")
                 # DEFECT NEEDS OUTPUT
             else:
-                logger.info("Scrap - unknown website information. Getting "
+                logger.info("Scrape: unknown website information. Getting "
                             "temp.html and screenshot")
                 driver.save_screenshot('unknown_screenshot.png')
                 with open("temp.html", "w") as temp:
@@ -169,10 +169,9 @@ class Scraper(object):
             if self.slack_send:
                 if self.listings:
                     logger.info(
-                        "Slack - found {} listings.".format(len(self.listings)))
+                        "Slack: found {} listings.".format(len(self.listings)))
                     message = "\nSearch Parameters: " \
                               "Rooms - {}, Guests - {} "\
-                              "_(Currently wrong, is 1 & 1)_ " \
                               "\n".format(rooms, guests)
                     for entry in self.listings:
                         logger.info(entry)
@@ -182,7 +181,7 @@ class Scraper(object):
                         message += 'Miles: {}\n'.format(entry[3])
                         self.send_message(self.channel, message)
                         message = ""
-                logger.info("Slack - message sent to {}".format(self.channel))
+                logger.info("Slack: message sent to {}".format(self.channel))
             else:
                 # DEPRECATED
                 logger.info("SOMETHING HERE")
@@ -192,7 +191,7 @@ class Scraper(object):
 
 
 if __name__ == "__main__":
-    logger.info("---START OF SEARCH AND SCRAP.---")
+    logger.info("---START OF SEARCH AND SCRAPE.---")
     scraper = Scraper(url, slacktoken, 'Test')  # 'Live', 'Test', 'Other'
     scraper.scrap(1, 4)  # # of rooms, # of guests
-    logger.info("---END OF SEARCH AND SCRAP.---")
+    logger.info("---END OF SEARCH AND SCRAPE.---")
