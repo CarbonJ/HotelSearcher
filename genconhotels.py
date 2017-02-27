@@ -39,13 +39,13 @@ class Scraper(object):
 
         if env == 'Live':
             self.channel = config.livechannel
-            logger.info("Results to be sent to '{}'.".format(self.channel))
+            logger.info("Parameters: results to be sent to '{}'.".format(self.channel))
         elif env == 'Test':
             self.channel = config.testchannel
-            logger.info("Results to be sent to '{}'.".format(self.channel))
+            logger.info("Parameters: results to be sent to '{}'.".format(self.channel))
         else:
             self.slack_send = False
-            logger.info("Results not sent to Slack ")
+            logger.info("Parameters: results not sent to Slack ")
 
     def send_message(self, channel_id, message):
         self.slack_client.api_call(
@@ -62,12 +62,13 @@ class Scraper(object):
 
         # Selenium getting page
         driver = webdriver.PhantomJS()
-        # driver = webdriver.Chrome('/Users/justin/Documents/Projects/GenconHotel/chromedriver')
+        # driver = webdriver.Chrome('/Users/justin/Documents/Projects/GenconHotel/chromedriver')  # Here for troubleshooting only
         driver.set_window_size(1120, 550)
         driver.get(self.url)
 
         # Input calendar parameters
         try:
+            logger.info('Search: locating calendar selections.')
             driver.find_element_by_css_selector("h5.accordion").click()
             driver.find_element_by_link_text("16").click()
             driver.find_element_by_css_selector(
@@ -79,65 +80,50 @@ class Scraper(object):
             logger.info(e)
 
         # Input room parameters
-        # DEFECT: Not getting proper values submitted via selenium
         try:
-            logger.info("SELENIUM WORK START")
-            select = driver.find_element_by_id("spinner-guest")
+            # DEFECT: Room # gets wiped out when doing the guest portion
+            # for not good reason.
+            # rselect = driver.find_element_by_id("spinner-room")
 
-            if select:
-                logger.info("Found 'spinner-guest")
-                logger.info(select)
-                logger.info('Current Value: {}'.format(select.get_attribute('aria-valuenow')))
-                logger.info(select)
+            # if rselect:
+            #     logger.info('Located room web field.')
+            #     driver.find_element_by_id("spinner-room").click()
+            #     driver.find_element_by_id("spinner-room").clear()
+            #     driver.find_element_by_id("spinner-room").send_keys('\b')
+            #     logger.info("Sending room value {}".format(rooms))
+            #     driver.find_element_by_id("spinner-room").send_keys(rooms)
 
-            time.sleep(2)
-            driver.execute_script("arguments[0].setAttribute('aria-valuenow','6')", select)
-            time.sleep(2)
-            finder = driver.find_element_by_id("spinner-guest")
-            if finder:
-                logger.info('New Value: {}'.format(finder.get_attribute('aria-valuenow')))
-                logger.info(finder)
-            time.sleep(2)
-            driver.find_element_by_id("spinner-guest").click()
-            driver.find_element_by_id("spinner-guest").clear()
-            driver.find_element_by_id("spinner-guest").send_keys('\b')
-            driver.find_element_by_id("spinner-guest").send_keys(guests)
-            #river.find_element_by_id("spinner-guest").submit()
-            logger.info('Post Click Value: {}'.format(select.get_attribute('aria-valuenow')))
+            gselect = driver.find_element_by_id("spinner-guest")
 
-            again = driver.find_element_by_id("spinner-guest")
-            logger.info(again.get_attribute('aria-valuenow'))
-            logger.info(again)
-            time.sleep(2)
-            driver.execute_script("arguments[0].setAttribute('aria-valuenow','6')", select)
-            logger.info('Set Again Value: {}'.format(select.get_attribute('aria-valuenow')))
+            if gselect:
+                logger.info('Search: locating guest web field.')
+                driver.find_element_by_id("spinner-guest").click()
+                driver.find_element_by_id("spinner-guest").clear()
+                driver.find_element_by_id("spinner-guest").send_keys('\b')
+                logger.info("Searching: sending guest value {}".format(guests))
+                driver.find_element_by_id("spinner-guest").send_keys(guests)
+                logger.info('Form Guest Value: {}'.format(gselect.get_attribute('aria-valuenow')))
 
-
-            # driver.find_element_by_id("spinner-room").click()
-            # driver.find_element_by_id("spinner-room").clear()
-            # driver.find_element_by_id("spinner-room").send_keys(rooms)
-            # driver.find_element_by_id("spinner-guest").click()
-            # driver.find_element_by_id("spinner-guest").clear()
-            # driver.find_element_by_id("spinner-guest").send_keys(guests)
-            time.sleep(5)
-            logger.info("SELENIUM WORK END")
+            time.sleep(1)
         except (Exception) as e:
             raise e
             logger.info(e)
 
         try:
+            logger.info('Search: submitting webform')
             driver.find_element_by_link_text("FIND").click()
-            time.sleep(5)  # sleep 5 seconds to allow transaction
+            time.sleep(3)  # sleep 5 seconds to allow transaction
         except driver.NoSuchElementException as e:
             driver.save_screenshot('screenshot.png')
             raise e
             logger.info(e)
 
         if driver.page_source:
+            logger.info("Scrap - 'a' web page found and now being scraped.")
             self.page = driver.page_source
 
             if "Please select one" in self.page:
-                logger.info("Search complete.")
+                logger.info("Scrap - hotels found.")
                 soup = BeautifulSoup(self.page, "lxml")
                 hclass = soup.find_all("div", {"class": "h-content"})
                 for tag1 in hclass:
@@ -157,22 +143,22 @@ class Scraper(object):
                         templist.append('.'.join(temp_mi))
                         self.listings.append(templist)
 
-                with open("results.html", "w") as temp:
+                with open("Scrap.html", "w") as temp:
                     temp.write(soup.prettify())
                     driver.save_screenshot('screenshot.png')
 
             elif "TERMS OF SERVICE" in self.page:
-                logger.info("Still on main page, nothing found or failed.")
+                logger.info("Scrap - main page detected, something failed.")
                 driver.save_screenshot('unknown_screenshot.png')
                 with open("temp.html", "w") as temp:
                     temp.write(driver.page_source)
             elif "Sorry..." in self.page:
-                logger.info("Website or navigation failed.")
+                logger.info("Scrap - error page detected, something failed")
             elif "No hotel matched your search criteria" in self.page:
-                logger.info("No matches found")
+                logger.info("Scrap - 0 hotels found with that criteria.")
                 # DEFECT NEEDS OUTPUT
             else:
-                logger.info("Unknown website information. Getting "
+                logger.info("Scrap - unknown website information. Getting "
                             "temp.html and screenshot")
                 driver.save_screenshot('unknown_screenshot.png')
                 with open("temp.html", "w") as temp:
@@ -183,7 +169,7 @@ class Scraper(object):
             if self.slack_send:
                 if self.listings:
                     logger.info(
-                        "Found {} listings.".format(len(self.listings)))
+                        "Slack - found {} listings.".format(len(self.listings)))
                     message = "\nSearch Parameters: " \
                               "Rooms - {}, Guests - {} "\
                               "_(Currently wrong, is 1 & 1)_ " \
@@ -196,8 +182,9 @@ class Scraper(object):
                         message += 'Miles: {}\n'.format(entry[3])
                         self.send_message(self.channel, message)
                         message = ""
-                logger.info("Slack message sent to {}".format(self.channel))
+                logger.info("Slack - message sent to {}".format(self.channel))
             else:
+                # DEPRECATED
                 logger.info("SOMETHING HERE")
                 if self.listings:
                     logger.info(
@@ -205,7 +192,7 @@ class Scraper(object):
 
 
 if __name__ == "__main__":
-    logger.info("Start of scraper.")
+    logger.info("---START OF SEARCH AND SCRAP.---")
     scraper = Scraper(url, slacktoken, 'Test')  # 'Live', 'Test', 'Other'
-    scraper.scrap(1, 6)  # # of rooms, # of guests
-    logger.info("End of scraper.")
+    scraper.scrap(1, 4)  # # of rooms, # of guests
+    logger.info("---END OF SEARCH AND SCRAP.---")
