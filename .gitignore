@@ -6,3 +6,5 @@ temp.html
 scraper.log
 unknown_screenshot.png
 config.py
+chromedriver
+scrape.html

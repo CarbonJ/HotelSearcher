@@ -16,4 +16,8 @@ Right now the biggest issue is Selenium.  When trying to set the room number and
 TBD
 - [ ] Fix room/guest input in selenium
 - [ ] Make addresses more 'readable'
+<<<<<<< HEAD
 - [ ] Maybe: convert to stand-alone Flas app (vs running via cron) to have page displaying most recent finds
+=======
+- [ ] Maybe: convert to stand-alone Flas app (vs running via cron) to have page displaying most recent finds
+>>>>>>> develop
