@@ -192,6 +192,6 @@ class Scraper(object):
 
 if __name__ == "__main__":
     logger.info("---START OF SEARCH AND SCRAPE.---")
-    scraper = Scraper(url, slacktoken, 'Test')  # 'Live', 'Test', 'Other'
+    scraper = Scraper(url, slacktoken, 'Live')  # 'Live', 'Test', 'Other'
     scraper.scrap(1, 4)  # # of rooms, # of guests
     logger.info("---END OF SEARCH AND SCRAPE.---")
