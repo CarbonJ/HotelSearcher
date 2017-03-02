@@ -8,12 +8,12 @@ app = Flask(__name__)
 
 
 # @app.route("/")
-def search():
-    genconhotels.logger.info("Start of scraper.")
+def search(guests):
+    genconhotels.logger.info("---START OF SEARCH AND SCRAPE.---")
     scraper = genconhotels.Scraper(
-        config.url, config.slacktoken, 'Live')  # 'Live', 'Test', 'Other'
-    scraper.scrap(1, 4)  # # of rooms, # of guests
-    genconhotels.logger.info("End of scraper.")
+        config.url, config.slacktoken, 'Test')  # 'Live', 'Test', 'Other'
+    scraper.scrap(1, guests)  # # of rooms, # of guests
+    genconhotels.logger.info("---END OF SEARCH AND SCRAPE.---")
 
     listfix = []
 
@@ -21,42 +21,27 @@ def search():
         listfix.append(base)
         listing = ''
         for entry in base:
-            genconhotels.logger.info(entry)
             listing += '<b>{}</b></br>'.format(entry)
-        #     listing += '<i>{}</i>/br>'.format(entry)
-        #     listing += 'Price: {}</br>'.format(entry)
-        #     listing += 'Miles: {}</br>'.format(entry)
-        # listfix.append(listing)
-        # genconhotels.logger.info(listing)
 
-        # for subitem in base:
-        #     for hotel in subitem:
-        #         templist.append(subitem)
+    if listfix:
+        return render_template(
+            'template.html',
+            listing_count=len(scraper.listings), my_list=listfix)
+    else:
+        return 'No results'
 
-
-        # message += '*{}*\n'.format(entry[0])
-        # message += '_{}_\n'.format(entry[1])
-        # message += 'Price: {}\n'.format(entry[2])
-        # message += 'Miles: {}\n'.format(entry[3])
-
-    return render_template(
-        'template.html',
-        listing_count=len(scraper.listings),
-        my_list=listfix)
-
-@app.route('/', methods=['GET'])
-def home():
-    return 'Home'
 
 @app.route('/hotels', methods=['POST'])
 def hotels():
+    genconhotels.logger.info('Flask: request received by slack command.')
+
     threads = []
-    t = threading.Thread(target=search)
+    t = threading.Thread(target=search, args=(4,))
     threads.append(t)
     t.start()
-    return 'Getting hotel information...'
-    search()
+    genconhotels.logger.info('Flask: submiting to search.')
 
+    return 'Getting hotel information...'
 
 
 if __name__ == '__main__':
