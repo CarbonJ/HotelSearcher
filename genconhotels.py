@@ -100,7 +100,7 @@ class Scraper(object):
                 driver.find_element_by_id("spinner-guest").click()
                 driver.find_element_by_id("spinner-guest").clear()
                 driver.find_element_by_id("spinner-guest").send_keys('\b')
-                logger.info("Searching: sending guest value {}".format(guests))
+                logger.info("Search: sending guest value {}".format(guests))
                 driver.find_element_by_id("spinner-guest").send_keys(guests)
                 #logger.info('Search: guest value on form: {}'.format(gselect.get_attribute('aria-valuenow')))
 
@@ -169,7 +169,7 @@ class Scraper(object):
             if self.slack_send:
                 if self.listings:
                     logger.info(
-                        "Slack: found {} listings.".format(len(self.listings)))
+                        "Slack: formating {} listings.".format(len(self.listings)))
                     message = "\nSearch Parameters: " \
                               "Rooms - {}, Guests - {} "\
                               "\n".format(rooms, guests)
