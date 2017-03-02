@@ -1,16 +1,18 @@
 from flask import Flask, render_template
 import genconhotels
 import config
+import threading
+
 
 app = Flask(__name__)
 
 
-@app.route("/")
-def template_test():
+# @app.route("/")
+def search():
     genconhotels.logger.info("Start of scraper.")
     scraper = genconhotels.Scraper(
-        config.url, config.slacktoken, 'Test')  # 'Live', 'Test', 'Other'
-    scraper.scrap(1, 3)  # # of rooms, # of guests
+        config.url, config.slacktoken, 'Live')  # 'Live', 'Test', 'Other'
+    scraper.scrap(1, 4)  # # of rooms, # of guests
     genconhotels.logger.info("End of scraper.")
 
     listfix = []
@@ -41,6 +43,20 @@ def template_test():
         'template.html',
         listing_count=len(scraper.listings),
         my_list=listfix)
+
+@app.route('/', methods=['GET'])
+def home():
+    return 'Home'
+
+@app.route('/hotels', methods=['POST'])
+def hotels():
+    threads = []
+    t = threading.Thread(target=search)
+    threads.append(t)
+    t.start()
+    return 'Getting hotel information...'
+    search()
+
 
 
 if __name__ == '__main__':
