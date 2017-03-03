@@ -7,7 +7,6 @@ import threading
 app = Flask(__name__)
 
 
-# @app.route("/")
 def search(guests):
     genconhotels.logger.info("---START OF SEARCH AND SCRAPE.---")
     scraper = genconhotels.Scraper(
