@@ -1,9 +1,12 @@
+# Third Party
 from selenium import webdriver
 from bs4 import BeautifulSoup
+from slackclient import SlackClient
+# Built-in
 import re
 import logging
 import time
-from slackclient import SlackClient
+# Custom
 import config
 
 # Basic variables out of config.py
