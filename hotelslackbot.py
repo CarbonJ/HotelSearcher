@@ -9,7 +9,7 @@ app = Flask(__name__)
 def search(guests):
     genconhotels.logger.info("---START OF SEARCH AND SCRAPE.---")
     scraper = genconhotels.Scraper(config.url, config.slacktoken,
-                                   'Test')  # 'Live', 'Test', 'Other'
+                                   config.env)  # 'Live', 'Test', 'Other'
     scraper.scrap(1, guests)  # # of rooms, # of guests
     genconhotels.logger.info("---END OF SEARCH AND SCRAPE.---")
 
