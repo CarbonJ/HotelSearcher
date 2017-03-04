@@ -32,45 +32,29 @@ def search(guests):
 
 @app.route('/hotels', methods=['POST'])
 def hotels():
-    genconhotels.logger.info('Flask: request received by slack command.')
-    #channel = request.form.get('channel_name')
+    genconhotels.logger.info('Slack: request received by slack command.')
+    channel = request.form.get('channel_name')
     username = request.form.get('user_name')
     text = request.form.get('text')
+    genconhotels.logger.info('Slack: {} channel alerted.'.format(channel))
     genconhotels.logger.info('Slack: {} searching for {} rooms.'.format(username, text))
 
     try:
         if isinstance(int(text), int):
             if 1 <= int(text) <= 6:
-                genconhotels.logger.info('GOOD')
-                return 'Good'
+                genconhotels.logger.info('Slack: {} is in proper range.'.format(text))
+                threads = []
+                t = threading.Thread(target=search, args=(text, ))
+                threads.append(t)
+                t.start()
+                genconhotels.logger.info('Flask: submiting to search.')
+                return 'Please wait while listings are searched for...'
             else:
+                genconhotels.logger.info('Slack: Room search value not in range.')
                 return 'Please enter a number between 1 and 6.'
     except ValueError as e:
         genconhotels.logger.info('Flask: error "{}" received.'.format(e))
         return 'Please enter a number between 1 and 6.'
-
-
-
-    # if int(text) % 1 == 0 and int(text) <= 6:
-    #     genconhotels.logger.info('Flask: Room search value in proper range.')
-    #     return 'Getting hotel information...'
-    # else:
-    #     genconhotels.logger.info('Flask: Room search value not in range.')
-    #     return 'Please enter a number between 1 and 6.'
-
-    #genconhotels.logger.info("Slack: received".format(inbound_message))
-
-    # if type(text) is int and int(text) <= 6:
-    #     threads = []
-    #     t = threading.Thread(target=search, args=(text, ))
-    #     threads.append(t)
-    #     t.start()
-    #     genconhotels.logger.info('Flask: submiting to search.')
-
-    #     return 'Getting hotel information...'
-    # else:
-    #     return 'Please enter a number between 1 and 6.'
-
 
 
 if __name__ == '__main__':
