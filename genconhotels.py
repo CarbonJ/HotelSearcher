@@ -32,6 +32,7 @@ logger.addHandler(handler)
 
 class Scraper(object):
     """Performs scraping and Slack notifications"""
+
     def __init__(self, url, slacktoken, env):
         self.url = url
         self.listings = []
@@ -42,10 +43,12 @@ class Scraper(object):
 
         if env == 'Live':
             self.channel = config.livechannel
-            logger.info("Parameters: results to be sent to '{}'.".format(self.channel))
+            logger.info(
+                "Parameters: results to be sent to '{}'.".format(self.channel))
         elif env == 'Test':
             self.channel = config.testchannel
-            logger.info("Parameters: results to be sent to '{}'.".format(self.channel))
+            logger.info(
+                "Parameters: results to be sent to '{}'.".format(self.channel))
         else:
             self.slack_send = False
             logger.info("Parameters: results not sent to Slack ")
@@ -60,8 +63,7 @@ class Scraper(object):
 
     def scrap(self, rooms, guests):
         logger.info("Parameters: starting URL: {}".format(self.url))
-        logger.info(
-            "Parameters:  Room# {}, Guest# {}".format(rooms, guests))
+        logger.info("Parameters:  Room# {}, Guest# {}".format(rooms, guests))
 
         # Selenium getting page
         driver = webdriver.PhantomJS()
@@ -171,8 +173,8 @@ class Scraper(object):
 
             if self.slack_send:
                 if self.listings:
-                    logger.info(
-                        "Slack: formating {} listings.".format(len(self.listings)))
+                    logger.info("Slack: formating {} listings.".format(
+                        len(self.listings)))
                     message = "\nSearch Parameters: " \
                               "Rooms - {}, Guests - {} "\
                               "\n".format(rooms, guests)
@@ -184,6 +186,8 @@ class Scraper(object):
                         message += 'Miles: {}\n'.format(entry[3])
                         self.send_message(self.channel, message)
                         message = ""
+                else:
+                    self.send_message(self.channel, "No hotels found for {} guests.".format(guests))
                 logger.info("Slack: message sent to {}".format(self.channel))
             else:
                 # DEPRECATED
@@ -195,6 +199,6 @@ class Scraper(object):
 
 if __name__ == "__main__":
     logger.info("---START OF SEARCH AND SCRAPE.---")
-    scraper = Scraper(url, slacktoken, 'Live')  # 'Live', 'Test', 'Other'
+    scraper = Scraper(url, slacktoken, config.env)
     scraper.scrap(1, 4)  # # of rooms, # of guests
     logger.info("---END OF SEARCH AND SCRAPE.---")
