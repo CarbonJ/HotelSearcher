@@ -186,6 +186,8 @@ class Scraper(object):
                         message += 'Miles: {}\n'.format(entry[3])
                         self.send_message(self.channel, message)
                         message = ""
+                else:
+                    self.send_message(self.channel, "No hotels found for {} guests.".format(guests))
                 logger.info("Slack: message sent to {}".format(self.channel))
             else:
                 # DEPRECATED

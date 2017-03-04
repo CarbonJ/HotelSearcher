@@ -13,21 +13,22 @@ def search(guests):
     scraper.scrap(1, guests)  # # of rooms, # of guests
     genconhotels.logger.info("---END OF SEARCH AND SCRAPE.---")
 
-    listfix = []
+    # listfix = []
 
-    for base in scraper.listings:
-        listfix.append(base)
-        listing = ''
-        for entry in base:
-            listing += '<b>{}</b></br>'.format(entry)
+    # for base in scraper.listings:
+    #     listfix.append(base)
+    #     listing = ''
+    #     for entry in base:
+    #         listing += '<b>{}</b></br>'.format(entry)
 
-    if listfix:
-        return render_template(
-            'template.html',
-            listing_count=len(scraper.listings),
-            my_list=listfix)
-    else:
-        return 'No results'
+    # if listfix:
+    #     genconhotels.logger.info('ISSUE: {}'.format(listfix))
+    #     return render_template(
+    #         'template.html',
+    #         listing_count=len(scraper.listings),
+    #         my_list=listfix)
+    # else:
+    #     return 'No results'
 
 
 @app.route('/hotels', methods=['POST'])
