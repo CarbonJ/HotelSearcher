@@ -1,6 +1,6 @@
 # HotelSearcher
 
-Something I've whipped together to help get information for my Slack group to find housing for some convention.  It is not pretty or even fully functional, but it is 'something'.
+Something I've written together to help get housing information for some friends to find housing for some convention.  It started as a small script and added as a small module and Slackbot.
 
 The config.example.py would need to be renamed (config.py) updated with the proper tokens and slack channels to be used.  It was written with Python 3.6 (though 3.x will work).  It also requires Selenium, BeautifulSoup 4, and slackclient.
 
@@ -11,13 +11,7 @@ The script will produce a pile of files while running:
 * a running process log
 * and other files if there's a failure
 
-Right now the biggest issue is Selenium.  When trying to set the room number and guest number, it is defaulting to 1 (vs the numbers I want).  My choices work fine in the Selenium IDE, but don't work when run via my script.
-
-TBD
-- [ ] Fix room/guest input in selenium
-- [ ] Make addresses more 'readable'
-<<<<<<< HEAD
-- [ ] Maybe: convert to stand-alone Flas app (vs running via cron) to have page displaying most recent finds
-=======
-- [ ] Maybe: convert to stand-alone Flas app (vs running via cron) to have page displaying most recent finds
->>>>>>> develop
+As of now, it's feature complete.  I may change more based on defect found or some proper refactoring, but otherwise it is complete.
+- [x] Fix room/guest input in selenium
+- [x] Make addresses more 'readable'
+- [x] Maybe: convert to stand-alone Flask app (vs running via cron) to have page displaying most recent finds
